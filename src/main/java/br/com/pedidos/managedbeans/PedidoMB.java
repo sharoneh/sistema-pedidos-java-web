@@ -75,9 +75,9 @@ public class PedidoMB implements Serializable {
             int pedidoId = Integer.parseInt(getPedidoIdFromUrl());
             Pedido pedido = new Pedido();
             pedido = getPedidos().stream()
-            .filter(pedido -> pedido.getId() == pedidoId) //?? não entendi porque ficou vermelho :c
-            .findFirst()
-            .orElse(null);
+                .filter(ped -> ped.getId() == pedidoId)
+                .findFirst()
+                .orElse(null);
         }catch(NumberFormatException ex){
             return;
         }

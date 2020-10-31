@@ -7,9 +7,6 @@ package br.com.pedidos.managedbeans;
 
 import br.com.pedidos.dao.ProdutoDAO;
 import br.com.pedidos.models.Produto;
-import com.sun.xml.internal.ws.util.ReadAllStream;
-
-import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -74,9 +71,9 @@ public class ProdutoMB implements Serializable{
             int produtoId = Integer.parseInt(getProdutoIdFromUrl());
             Produto produto = new Produto();
             produto = getProdutos().stream()
-            .filter(produto -> produto.getId() == produtoId)
-            .findFirst()
-            .orElse(null);
+                .filter(prod -> prod.getId() == produtoId)
+                .findFirst()
+                .orElse(null);
         }catch(NumberFormatException ex){
             return;
         }
