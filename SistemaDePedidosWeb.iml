@@ -40,5 +40,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax:javaee-api:8.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: com.sun.mail:javax.mail:1.6.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="library" name="mysql-connector-java-8.0.21" level="project" />
+    <orderEntry type="library" name="commons-lang3-3.10" level="project" />
   </component>
 </module>
