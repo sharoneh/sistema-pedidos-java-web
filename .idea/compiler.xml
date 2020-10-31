@@ -15,7 +15,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="SistemaDePedidosWeb" options="-endorseddirs C:\Users\regis\Workspace\SistemaDePedidosWeb\target/endorsed" />
+      <module name="SistemaDePedidosWeb" options="-endorseddirs C:\Users\regis\Workspace\sistema-pedidos-java-web\target/endorsed" />
     </option>
   </component>
 </project>

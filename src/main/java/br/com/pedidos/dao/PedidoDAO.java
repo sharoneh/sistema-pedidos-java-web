@@ -1,9 +1,11 @@
 package br.com.pedidos.dao;
 
+import br.com.pedidos.models.Cliente;
 import br.com.pedidos.models.ItemDoPedido;
 import br.com.pedidos.models.Pedido;
 import br.com.pedidos.models.Produto;
 
+import javax.mail.FetchProfile;
 import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,6 +24,12 @@ public class PedidoDAO {
 
     private Connection connection;
 
+    /**
+     * Cria um Pedido para um Cliente.
+     * @param clienteID
+     * @return
+     * @throws SQLException
+     */
     public Pedido createPedido(int clienteID) throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         Pedido result = findPedido(clienteID, false);
@@ -37,9 +45,18 @@ public class PedidoDAO {
             return p;
         } catch (SQLException sqle) {
             throw new SQLException(sqle.getMessage());
+        } finally {
+            this.connection.close();
         }
     }
 
+    /**
+     * Retorna o Pedido simples (ID, data) de um Cliente.
+     * @param clienteID
+     * @param closeConnection
+     * @return
+     * @throws SQLException
+     */
     private Pedido findPedido(int clienteID, boolean closeConnection) throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         Pedido result = new Pedido();
@@ -63,6 +80,13 @@ public class PedidoDAO {
         return result;
     }
 
+
+    /**
+     * Retorna o Pedido completo (Pedido, Cliente, ItensDoPedido (Produto, Quantidade)) de um Cliente.
+     * @param clientID
+     * @return
+     * @throws SQLException
+     */
     public List<ItemDoPedido> findItensDoCliente(int clientID) throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         List<ItemDoPedido> resultList = new ArrayList<>();
@@ -90,6 +114,12 @@ public class PedidoDAO {
         return resultList;
     }
 
+    /**
+     * Adiciona um ItemDoPedido a um Pedido.
+     * @param item
+     * @param pedido
+     * @throws SQLException
+     */
     public void saveItem(ItemDoPedido item, int pedido) throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         String add = "INSERT INTO produto_pedido (produto_fk, pedido_fk, quantidade) VALUES (?, ?, ?)";
@@ -107,9 +137,9 @@ public class PedidoDAO {
         }
     }
 
+
     public void atualizaQuantidade(ItemDoPedido item, int cliente) throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
-
         String update = "UPDATE produto_pedido pp " +
                 "JOIN produto pdt ON pp.produto_fk = pdt.id " +
                 "JOIN pedido pdd ON pp.pedido_fk = pdd.id " +
@@ -130,6 +160,12 @@ public class PedidoDAO {
         }
     }
 
+    /**
+     * Varre todos os Pedidos e DELETA todos os pedidos em que a quantidade de
+     * TODOS os seus itens é menor ou igual a ZERO.
+     * @param cliente
+     * @throws SQLException
+     */
     public void deleteGarbage(int cliente) throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         String delete = "DELETE pp FROM produto_pedido pp " +
@@ -148,23 +184,58 @@ public class PedidoDAO {
         }
     }
 
+    /**
+     * Retorna lista com todos os Pedidos (completos).
+     * @return
+     * @throws SQLException
+     */
     public List<Pedido> fetchAll() throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         List<Pedido> result = new ArrayList<>();
-        String findAll = "SELECT prd.id AS proid, prd.descricao AS prodesc, pp.quantidade as quantidade " +
-                "FROM produto_pedido pp " +
-                "JOIN produto prd ON prd.id = pp.produto_fk " +
-                "JOIN pedido pdd ON pp.pedido_fk = pdd.id " +
-                "ORDER BY pp.pedido_fk";
+        String findAll = "SELECT p.data AS data," +
+                "c.id AS cid, c.nome, c.sobrenome, c.cpf," +
+                "prd.id AS proid, prd.descricao AS prodesc," +
+                "pp.quantidade " +
+                "FROM pedido p " +
+                "JOIN cliente c ON p.cliente_fk = c.id " +
+                "JOIN produto_pedido pp on p.id = pp.pedido_fk " +
+                "JOIN produto prd on pp.produto_fk = prd.id ";
         try {
             PreparedStatement itensStatement = connection.prepareStatement(findAll);
             ResultSet rs = itensStatement.executeQuery();
-
+            List<ItemDoPedido> itens = new ArrayList<>();
             while (rs.next()) {
-                Produto each = new Produto();
-                each.setId(rs.getInt("proid"));
-                each.setDescricao(rs.getString("prodesc"));
+                Pedido each = new Pedido();
+                Produto p = new Produto();
+                ItemDoPedido i = new ItemDoPedido();
 
+                p.setId(rs.getInt("proid"));
+                p.setDescricao(rs.getString("prodesc"));
+
+                i.setQuantidade(rs.getInt("quantidade"));
+                i.setProduto(p);
+                itens.add(i);
+
+//              Esse trecho verifica se o cliente atual é o mesmo que o proximo
+                int currentClient = rs.getInt("cid");
+                int nextClient = 0;
+                rs.next();
+                nextClient = rs.getInt("cid");
+                rs.previous();
+
+//              O Cliente deste Pedido só será preenchido quando for diferente do proximo Cliente
+                if (currentClient != nextClient) {
+                    Cliente c = new Cliente();
+                    c.setId(rs.getInt("clid"));
+                    c.setNome(rs.getString("nome"));
+                    c.setSobrenome(rs.getString("sobrenome"));
+                    c.setCpf(rs.getString("cpf"));
+                    each.setCliente(c);
+//                  A lista de itens deste Pedido só será adicionada quando este Cliente for diferente do proximo Cliente
+                    each.setItens(itens);
+//                  Limpa a lista de itens do pedido para o proximo Pedido
+                    itens.clear();
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -172,6 +243,55 @@ public class PedidoDAO {
         return result;
     }
 
-    public Pedido find(int id) {
+    /**
+     * Retorna o Pedido completo (Pedido, Cliente, ItensDoPedido (Produto, Quantidade)).
+     * @param id
+     * @return
+     * @throws SQLException
+     */
+    public Pedido find(int id) throws SQLException {
+        this.connection = new ConnectionFactory().getConnection();
+        Pedido result = new Pedido();
+        String findOne = "SELECT p.data AS data," +
+                "c.id AS cid, c.nome, c.sobrenome, c.cpf," +
+                "prd.id AS proid, prd.descricao AS prodesc," +
+                "pp.quantidade " +
+                "FROM pedido p " +
+                "JOIN cliente c ON p.cliente_fk = c.id " +
+                "JOIN produto_pedido pp on p.id = pp.pedido_fk " +
+                "JOIN produto prd on pp.produto_fk = prd.id " +
+                "WHERE p.id = ?";
+        try {
+            PreparedStatement ps = connection.prepareStatement(findOne);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            Cliente c = new Cliente();
+            List<ItemDoPedido> itens = new ArrayList<>();
+            if (rs.next()) {
+                c.setId(rs.getInt("clid"));
+                c.setNome(rs.getString("nome"));
+                c.setSobrenome(rs.getString("sobrenome"));
+                c.setCpf(rs.getString("cpf"));
+            }
+            rs.beforeFirst();
+            while (rs.next()) {
+                Produto p = new Produto();
+                p.setDescricao(rs.getString("prodesc"));
+                p.setId(rs.getInt("proid"));
+
+                ItemDoPedido each = new ItemDoPedido();
+                each.setProduto(p);
+                each.setQuantidade(rs.getInt(rs.getInt("quantidade")));
+                itens.add(each);
+            }
+            result.setId(id);
+            result.setData(rs.getDate("data"));
+            result.setCliente(c);
+            result.setItens(itens);
+
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return result;
     }
 }
