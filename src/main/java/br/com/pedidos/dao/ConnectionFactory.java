@@ -17,8 +17,8 @@ public class ConnectionFactory {
             String timezone = "useTimezone=true&serverTimezone=America/Sao_Paulo";
             return DriverManager.getConnection(
                     "jdbc:mysql://35.198.31.4:3306/pedinte?",
-                    "pedinte-cloud",
-                    ".Cymbalin3#");
+                    "Amsterdam",
+                    ".Netherlands#");
         } catch (SQLException sqle) {
             throw new SQLException(sqle.getMessage());
         }

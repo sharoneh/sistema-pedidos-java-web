@@ -88,7 +88,7 @@ public class PedidoMB implements Serializable {
     }
     
     public String incluirPedido(Produto produto, int q, Pedido pedido) {
-        System.out.println("Adicionando produto " + produto.getDescricao() + " ao pedido de " + c.getNome());
+        System.out.println("Adicionando produto " + produto.getDescricao() + " ao pedido numero " + pedido.getId());
         try {
             dao = new PedidoDAO();
             ItemDoPedido item = new ItemDoPedido(q, produto);
