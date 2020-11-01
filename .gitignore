@@ -2,3 +2,9 @@
 
 .idea/
 target/
+
+# NetBeans
+build
+dist
+nbproject/private
+src/resources/config.properties
