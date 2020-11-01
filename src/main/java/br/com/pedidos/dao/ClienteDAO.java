@@ -1,6 +1,7 @@
 package br.com.pedidos.dao;
 
 import br.com.pedidos.models.Cliente;
+import java.io.Serializable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -15,7 +16,7 @@ import java.util.List;
  * 09/10/2020
  */
 
-public class ClienteDAO {
+public class ClienteDAO implements Serializable {
 
     private Connection connection;
 

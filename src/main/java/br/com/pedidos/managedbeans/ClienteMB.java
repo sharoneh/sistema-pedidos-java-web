@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 
 @Named
 @SessionScoped
@@ -34,6 +35,7 @@ public class ClienteMB implements Serializable {
     */
 
     ClienteDAO dao;
+    List<Cliente> clientes;
 
     public Cliente getCliente(int id) throws SQLException {
         System.out.println("Buscando cliente com ID = " + id);
@@ -47,17 +49,30 @@ public class ClienteMB implements Serializable {
         return result;
     }
 
-    public List<Cliente> getClientes() throws SQLException {
-        System.out.println("Buscando todos os clientes");
-        List<Cliente> result = new ArrayList<>();
+    @PostConstruct
+    public void init() {
+        this.clientes = new ArrayList<Cliente>();
+        
         try {
             dao = new ClienteDAO();
-            result = dao.fetchAll();
+            this.clientes = dao.fetchAll();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+    
+    public List<Cliente> getClientes() throws SQLException {
+//        System.out.println("Buscando todos os clientes");
+//        List<Cliente> result = new ArrayList<>();
+//        try {
+//            dao = new ClienteDAO();
+//            result = dao.fetchAll();
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
 
-        return result;
+//        return result;
+        return this.clientes;
     }
 
     public String adicionar(Cliente cliente) throws SQLException {

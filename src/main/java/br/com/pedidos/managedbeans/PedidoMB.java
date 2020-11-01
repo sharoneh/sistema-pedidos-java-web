@@ -27,6 +27,8 @@ public class PedidoMB implements Serializable {
     }*/
 
     PedidoDAO dao;
+    List<Pedido> pedidos;
+    String teste = "lorem ipsum";
 
     public Pedido getPedido(int id) {
         System.out.println("Buscando pedido com ID = " + id);
