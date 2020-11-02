@@ -96,7 +96,7 @@ public class ClienteDAO implements Serializable {
 
     public List<Cliente> fetchAll() throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
-        String selectAll = "SELECT id, nome, sobrenome FROM cliente";
+        String selectAll = "SELECT id, nome, cpf, sobrenome FROM cliente";
         PreparedStatement ps = connection.prepareStatement(selectAll);
         ResultSet rs = ps.executeQuery();
 
@@ -104,6 +104,7 @@ public class ClienteDAO implements Serializable {
         while (rs.next()) {
             Cliente each = new Cliente();
             each.setId(rs.getInt("id"));
+            each.setCpf(rs.getString("cpf"));
             each.setNome(rs.getString("nome"));
             each.setSobrenome((rs.getString("sobrenome")));
             result.add(each);

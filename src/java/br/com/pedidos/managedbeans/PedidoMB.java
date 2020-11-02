@@ -11,13 +11,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.mail.FetchProfile;
 
 @Named
-@SessionScoped
+@RequestScoped
 public class PedidoMB implements Serializable {
 /*  private Pedido pedido = new Pedido();
     private List<Pedido> pedidos;

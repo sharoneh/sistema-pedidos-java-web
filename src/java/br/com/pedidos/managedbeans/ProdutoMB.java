@@ -12,13 +12,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
 @Named
-@SessionScoped
+@RequestScoped
 public class ProdutoMB implements Serializable{
 /*    private Produto produto = new Produto();
     private List<Produto> produtos;

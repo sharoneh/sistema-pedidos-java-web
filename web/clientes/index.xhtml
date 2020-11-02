@@ -9,34 +9,62 @@
     <div class="container">
         <br />
         <h:messages />
-        <h1>Clientes <h:link title="Adicionar cliente" outcome="new"><i class="fa fa-plus fa-3"></i></h:link></h1>
+        
+        <h1>
+            Clientes 
+            <h:link title="Adicionar cliente" outcome="new">
+                <i class="fa fa-plus fa-3"></i>
+            </h:link>
+        </h1>
+        
         <h:form>
             <h:dataTable class="table table-striped" value="#{clienteMB.clientes}" var="cliente">
                 <h:column>
                     <f:facet name="header">
                         Cliente
                     </f:facet>
-                    <!--# {cliente.nomeCompleto}-->
-                    #{cliente.nome}
+                    
+                    #{cliente.nomeCompleto}
                 </h:column>
                 <h:column>
                     <f:facet name="header">
                         CPF
                     </f:facet>
-                    <!--# {cliente.cpf}-->
+                    
+                    #{cliente.cpf}
                 </h:column>
                 <h:column>
                     <f:facet name="header">
                         Ações
                     </f:facet>
-                    <h:link type="button" class="btn btn-primary icon-button" title="Editar" outcome="edit"><i class="fas fa-edit"></i>
-                        <!--<f:param name="id" value="# {cliente.id}" />-->
+                    
+                    <h:link
+                        type="button"
+                        class="btn btn-primary icon-button"
+                        title="Editar"
+                        outcome="edit"
+                    >
+                        <i class="fas fa-edit"></i>
+                        
+                        <f:param name="id" value="#{cliente.id}" />
                     </h:link>
-<!--                    <h:commandLink rendered="# {clienteMB.podeExcluir(cliente)}" type="button" class="btn btn-danger icon-button" title="Excluir" style="margin-left: 10px;"><i class="fas fa-trash-alt"></i>
+                    
+                    <h:commandLink
+                        action="#{clienteMB.excluir}"
+                        type="button"
+                        class="btn btn-danger icon-button"
+                        title="Excluir"
+                        style="margin-left: 10px;"
+                    >
+                        <i class="fas fa-trash-alt"></i>
+                        
                         <f:passThroughAttribute name="data-toggle" value="modal" />
                         <f:passThroughAttribute name="data-target" value="#deleteClientModal" />
-                        <f:ajax listener="# {clienteMB.setCliente(cliente)}" render="deleteClientModalForm" />
-                    </h:commandLink>-->
+                        <f:ajax
+                            listener="#{clienteMB.setCliente(clienteMB.getCliente(cliente.id))}"
+                            render="deleteClientModalForm"
+                        />
+                    </h:commandLink>
                 </h:column>
             </h:dataTable>
         </h:form>
@@ -55,7 +83,14 @@
                 <h:form id="deleteClientModalForm" role="form">
                     <div class="modal-body" style="text-align: center;">
                         <div class="form-group">
-                            <!--<p>Você deseja excluir o cliente <b><span># {clienteMB.cliente.nomeCompleto}</span></b>?<br/><br/><i class="fas fa-exclamation-triangle" style="color: red;"></i> Cuidado! Esta operação é irreversível.</p>-->
+                            <p>Você deseja excluir o cliente 
+                                <!--<b><span># {clienteMB.cliente.nome} # {clienteMB.cliente.sobrenome}</span></b>-->
+                                ?
+                                <br/><br/>
+                                
+                                <i class="fas fa-exclamation-triangle" style="color: red;"></i> 
+                                Cuidado! Esta operação é irreversível.
+                            </p>
                         </div>
                     </div>
                     <div class="modal-footer">

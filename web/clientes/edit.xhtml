@@ -7,7 +7,8 @@
              xmlns:f="http://xmlns.jcp.org/jsf/core">
     
     <f:metadata>
-        <f:event type="preRenderView" listener="#{clienteMB.prepararEdicao()}"/>
+        <f:event type="preRenderView" listener="#{clienteMB.prepararEdicao(Integer.parseInt(param.id))}"/>
+        <!--<f:event type="preRenderView" listener="# {clienteMB.setCliente(clienteMB.getCliente(param.id))}"/>-->
     </f:metadata>
     
     <div class="container">
@@ -15,25 +16,26 @@
         <h:form>
             <div class="form-group">
                 <label for="nome">Nome</label>
-                <h:inputText id="nome" class="form-control" value = "#{clienteMB.cliente.nome}" required="true" requiredMessage="Nome do cliente deve ser preenchido" />
+                
+                <!--<h:inputText id="nome" class="form-control" value = "# {clienteMB.cliente.nome}" required="true" requiredMessage="Nome do cliente deve ser preenchido" />-->
                 <h:message for="nome" errorStyle="color: red;" />
             </div>
             
             <div class="form-group">
                 <label for="sobrenome">Sobrenome</label>
-                <h:inputText id="sobrenome" class="form-control" value = "#{clienteMB.cliente.sobrenome}" required="true" requiredMessage="Sobrenome do cliente deve ser preenchido" />
+                <!--<h:inputText id="sobrenome" class="form-control" value = "# {clienteMB.cliente.sobrenome}" required="true" requiredMessage="Sobrenome do cliente deve ser preenchido" />-->
                 <h:message for="sobrenome" errorStyle="color: red;" />
             </div>
             
             <div class="form-group">
                 <label for="cpf">CPF</label>
-                <h:inputText id="cpf" class="form-control cpf-cliente" value = "#{clienteMB.cliente.cpf}" required="true" requiredMessage="CPF do cliente deve ser preenchido">
+<!--                <h:inputText id="cpf" class="form-control cpf-cliente" value = "# {clienteMB.cliente.cpf}" required="true" requiredMessage="CPF do cliente deve ser preenchido">
                     <f:validator validatorId="br.com.pedidos.validators.CpfUnicoClienteValidator" />
-                </h:inputText>
+                </h:inputText>-->
                 <h:message for="cpf" errorStyle="color: red;" />
             </div>
             
-            <h:commandButton class="btn btn-primary" action="#{clienteMB.editar()}" value="Salvar" />
+            <!--<h:commandButton class="btn btn-primary" action="# {clienteMB.editar()}" value="Salvar" />-->
             <a class="btn btn-secondary" href="index.xhtml" role="button">Cancelar</a>
         </h:form>
     </div>
