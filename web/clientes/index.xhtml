@@ -18,7 +18,7 @@
         </h1>
         
         <h:form>
-            <h:dataTable class="table table-striped" value="#{clienteMB.clientes}" var="cliente">
+            <h:dataTable class="table table-striped" value="#{clientesMB.clientes}" var="cliente">
                 <h:column>
                     <f:facet name="header">
                         Cliente
@@ -50,7 +50,7 @@
                     </h:link>
                     
                     <h:commandLink
-                        action="#{clienteMB.excluir}"
+                        action="#{clientesMB.excluir}"
                         type="button"
                         class="btn btn-danger icon-button"
                         title="Excluir"
@@ -61,7 +61,7 @@
                         <f:passThroughAttribute name="data-toggle" value="modal" />
                         <f:passThroughAttribute name="data-target" value="#deleteClientModal" />
                         <f:ajax
-                            listener="#{clienteMB.setCliente(clienteMB.getCliente(cliente.id))}"
+                            listener="#{clientesMB.setCliente(clientesMB.getCliente(cliente.id))}"
                             render="deleteClientModalForm"
                         />
                     </h:commandLink>

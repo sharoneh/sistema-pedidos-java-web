@@ -2,11 +2,15 @@ package br.com.pedidos.models;
 
 public class Cliente {
     private int id;
-    private String Nome;
-    private String Sobrenome;
-    private String Cpf;
+    private String nome;
+    private String sobrenome;
+    private String cpf;
 
     public Cliente() {
+        this.id = 0;
+        this.nome = "";
+        this.sobrenome = "";
+        this.cpf = "";
     }
 
     public int getId() {
@@ -18,32 +22,30 @@ public class Cliente {
     }
 
     public String getNome() {
-        return Nome;
+        return this.nome;
     }
 
-    public void setNome(String Nome) {
-        this.Nome = Nome;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getSobrenome() {
-        return Sobrenome;
+        return sobrenome;
     }
 
-    public void setSobrenome(String Sobrenome) {
-        this.Sobrenome = Sobrenome;
+    public void setSobrenome(String sobrenome) {
+        this.sobrenome = sobrenome;
     }
 
     public String getCpf() {
-        return Cpf;
+        return this.cpf;
     }
 
-    public void setCpf(String Cpf) {
-        this.Cpf = Cpf;
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
     }
     
     public String getNomeCompleto(){
-        return this.Nome + " " + this.Sobrenome;
-    }    
-    
-    
+        return this.nome + " " + this.sobrenome;
+    }
 }
