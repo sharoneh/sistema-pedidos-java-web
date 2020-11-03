@@ -7,11 +7,13 @@ package br.com.pedidos.managedbeans;
 
 import br.com.pedidos.dao.ClienteDAO;
 import br.com.pedidos.models.Cliente;
+
+import java.io.Serializable;
 import java.sql.SQLException;
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 /**
@@ -19,8 +21,8 @@ import javax.inject.Named;
  * @author sharonhasegawa
  */
 @Named
-@RequestScoped
-public class ClienteMB {
+@ViewScoped
+public class ClienteMB implements Serializable {
     private ClienteDAO dao;
     private Cliente cliente;
     
@@ -34,7 +36,17 @@ public class ClienteMB {
         return this.cliente;
     }
     
-    public String adicionaCliente() throws SQLException {
+    public void setCliente(int id) {
+        try {
+            this.cliente = this.dao.find(id);
+        } catch (SQLException e) {
+            System.out.println("SQLException: Erro ao definir o cliente do managed bean ClientesMB: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("NumberFormatException: Erro ao definir o cliente do managed bean ClientesMB: " + e.getMessage());
+        }
+    }
+    
+    public String adicionar() throws SQLException {
         try {
             this.dao.createCliente(this.cliente);
         }  catch (SQLException e) {
@@ -45,6 +57,14 @@ public class ClienteMB {
         context.addMessage("", new FacesMessage("Cliente cadastrado com sucesso"));
 
         return "index.xhtml";
+    }
+    
+    public void excluir() throws SQLException {
+        try {
+            this.dao.removeCliente(this.cliente);
+        } catch (SQLException e) {
+            System.out.println("Erro na tentativa de excluir um cliente: " + e.getMessage());
+        }
     }
     
     //    public Cliente getCliente(int id) throws SQLException {

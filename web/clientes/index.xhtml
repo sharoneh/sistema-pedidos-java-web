@@ -50,7 +50,7 @@
                     </h:link>
                     
                     <h:commandLink
-                        action="#{clientesMB.excluir}"
+                        action="#{clienteMB.setCliente(cliente.id)}"
                         type="button"
                         class="btn btn-danger icon-button"
                         title="Excluir"
@@ -60,10 +60,8 @@
                         
                         <f:passThroughAttribute name="data-toggle" value="modal" />
                         <f:passThroughAttribute name="data-target" value="#deleteClientModal" />
-                        <f:ajax
-                            listener="#{clientesMB.setCliente(clientesMB.getCliente(cliente.id))}"
-                            render="deleteClientModalForm"
-                        />
+                        
+                        <f:ajax render="deleteClientModalForm" />
                     </h:commandLink>
                 </h:column>
             </h:dataTable>
@@ -84,8 +82,7 @@
                     <div class="modal-body" style="text-align: center;">
                         <div class="form-group">
                             <p>Você deseja excluir o cliente 
-                                <!--<b><span># {clienteMB.cliente.nome} # {clienteMB.cliente.sobrenome}</span></b>-->
-                                ?
+                                <b><span>#{clienteMB.cliente.nomeCompleto}</span></b>?
                                 <br/><br/>
                                 
                                 <i class="fas fa-exclamation-triangle" style="color: red;"></i> 
@@ -95,7 +92,12 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                        <!--<h:commandButton class="btn btn-primary" value="Ok" action="# {clienteMB.excluir()}" />-->
+                        
+                        <h:commandButton
+                            class="btn btn-primary"
+                            value="Ok"
+                            action="#{clienteMB.excluir}"
+                        />
                     </div>
                 </h:form>
             </div>
