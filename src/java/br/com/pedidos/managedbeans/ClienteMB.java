@@ -10,6 +10,7 @@ import br.com.pedidos.models.Cliente;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
@@ -30,6 +31,18 @@ public class ClienteMB implements Serializable {
     public void init() {
         this.cliente = new Cliente();
         this.dao = new ClienteDAO();
+        
+        String clienteIdParam = this.getClienteIdParam();
+        
+        if (clienteIdParam != null) {
+            this.setCliente(Integer.parseInt(clienteIdParam));
+        }
+    }
+    
+    public String getClienteIdParam(){
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
+        return paramMap.get("id");
     }
     
     public Cliente getCliente() {
@@ -40,13 +53,13 @@ public class ClienteMB implements Serializable {
         try {
             this.cliente = this.dao.find(id);
         } catch (SQLException e) {
-            System.out.println("SQLException: Erro ao definir o cliente do managed bean ClientesMB: " + e.getMessage());
+            System.out.println("SQLException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println("NumberFormatException: Erro ao definir o cliente do managed bean ClientesMB: " + e.getMessage());
+            System.out.println("NumberFormatException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
         }
     }
     
-    public String adicionar() throws SQLException {
+    public String adicionar() {
         try {
             this.dao.createCliente(this.cliente);
         }  catch (SQLException e) {
@@ -54,42 +67,34 @@ public class ClienteMB implements Serializable {
         }
 
         FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("", new FacesMessage("Cliente cadastrado com sucesso"));
+        context.addMessage("", new FacesMessage("Cliente " + this.cliente.getNomeCompleto() + " cadastrado com sucesso!"));
 
         return "index.xhtml";
     }
     
-    public void excluir() throws SQLException {
+    public void excluir() {
         try {
             this.dao.removeCliente(this.cliente);
         } catch (SQLException e) {
             System.out.println("Erro na tentativa de excluir um cliente: " + e.getMessage());
         }
+        
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("", new FacesMessage("Cliente " + this.cliente.getNomeCompleto() + " excluído com sucesso!"));
     }
     
-    //    public Cliente getCliente(int id) throws SQLException {
-//        System.out.println("Buscando cliente com ID = " + id);
-//        Cliente result = new Cliente();
-//        try {
-//            dao = new ClienteDAO();
-//            result = dao.find(id);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return result;
-//    }
-    
-    //
-//    public String editar(Cliente cliente) throws SQLException {
-//        System.out.println("Editando cliente com CPF = " + cliente.getNomeCompleto());
-//        try {
-//            dao = new ClienteDAO();
-//            dao.updateCliente(cliente);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return "index.xhtml";
-//    }
+    public String editar() {
+        try {
+            this.dao.updateCliente(this.cliente);
+        } catch (SQLException e) {
+            System.out.println("Erro ao editar cliente: " + e.getMessage());
+        }
+        
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("", new FacesMessage("Cliente " + this.cliente.getNomeCompleto() + " editado com sucesso!"));
+        
+        return "index.xhtml";
+    }
 //    
 //    public void excluir(int id) throws SQLException {
 //        System.out.println("Tentando excluir cliente com ID = " + id);
@@ -101,12 +106,6 @@ public class ClienteMB implements Serializable {
 //        } catch (SQLException e) {
 //            e.printStackTrace();
 //        }
-//    }
-
-//    public String getClienteIdFromUrl(){
-//        FacesContext context = FacesContext.getCurrentInstance();
-//        Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
-//        return paramMap.get("id");
 //    }
 
 //    public void prepararEdicao(int id) {
