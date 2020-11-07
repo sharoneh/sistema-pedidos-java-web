@@ -10,6 +10,8 @@ import br.com.pedidos.models.Cliente;
 
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -26,11 +28,20 @@ import javax.inject.Named;
 public class ClienteMB implements Serializable {
     private ClienteDAO dao;
     private Cliente cliente;
+    private List<Cliente> clientes;
+    private final String INDEX_PAGE = "index.xhtml";
     
     @PostConstruct
     public void init() {
-        this.cliente = new Cliente();
         this.dao = new ClienteDAO();
+        this.cliente = new Cliente();
+        this.clientes = new ArrayList<>();
+        
+        try {
+            this.clientes = dao.fetchAll();
+        } catch (SQLException e) {
+            this.addMessage("Erro ao buscar a lista de clientes: " + e.getMessage());
+        }
         
         String clienteIdParam = this.getClienteIdParam();
         
@@ -45,6 +56,15 @@ public class ClienteMB implements Serializable {
         return paramMap.get("id");
     }
     
+    public void addMessage(String msg) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("", new FacesMessage(msg));
+    }
+    
+    public List<Cliente> getClientes() throws SQLException {
+        return this.clientes;
+    }
+    
     public Cliente getCliente() {
         return this.cliente;
     }
@@ -53,9 +73,9 @@ public class ClienteMB implements Serializable {
         try {
             this.cliente = this.dao.find(id);
         } catch (SQLException e) {
-            System.out.println("SQLException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
+            this.addMessage("SQLException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
         } catch (NumberFormatException e) {
-            System.out.println("NumberFormatException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
+            this.addMessage("NumberFormatException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
         }
     }
     
@@ -63,36 +83,35 @@ public class ClienteMB implements Serializable {
         try {
             this.dao.createCliente(this.cliente);
         }  catch (SQLException e) {
-            System.out.println("Erro na tentativa de adicionar um cliente: " + e.getMessage());
+            this.addMessage("Erro na tentativa de adicionar um cliente: " + e.getMessage());
+            return this.INDEX_PAGE;
         }
 
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("", new FacesMessage("Cliente " + this.cliente.getNomeCompleto() + " cadastrado com sucesso!"));
-
-        return "index.xhtml";
+        this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " cadastrado com sucesso!");
+        return this.INDEX_PAGE;
     }
     
     public void excluir() {
         try {
             this.dao.removeCliente(this.cliente);
+            this.clientes = dao.fetchAll();
         } catch (SQLException e) {
-            System.out.println("Erro na tentativa de excluir um cliente: " + e.getMessage());
+            this.addMessage("Erro na tentativa de excluir um cliente: " + e.getMessage());
+            return;
         }
         
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("", new FacesMessage("Cliente " + this.cliente.getNomeCompleto() + " excluído com sucesso!"));
+        this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " excluído com sucesso!");
     }
     
     public String editar() {
         try {
             this.dao.updateCliente(this.cliente);
         } catch (SQLException e) {
-            System.out.println("Erro ao editar cliente: " + e.getMessage());
+            this.addMessage("Erro ao editar cliente: " + e.getMessage());
+            return this.INDEX_PAGE;
         }
         
-        FacesContext context = FacesContext.getCurrentInstance();
-        context.addMessage("", new FacesMessage("Cliente " + this.cliente.getNomeCompleto() + " editado com sucesso!"));
-        
-        return "index.xhtml";
+        this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " editado com sucesso!");
+        return this.INDEX_PAGE;
     }
 }
