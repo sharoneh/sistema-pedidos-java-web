@@ -19,17 +19,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
-/**
- *
- * @author sharonhasegawa
- */
 @Named
 @ViewScoped
 public class ClienteMB implements Serializable {
     private ClienteDAO dao;
     private Cliente cliente;
     private List<Cliente> clientes;
-    private final String INDEX_PAGE = "index.xhtml";
+    private final String CLIENTS_PAGE = "index.xhtml";
     
     @PostConstruct
     public void init() {
@@ -84,11 +80,11 @@ public class ClienteMB implements Serializable {
             this.dao.createCliente(this.cliente);
         }  catch (SQLException e) {
             this.addMessage("Erro na tentativa de adicionar um cliente: " + e.getMessage());
-            return this.INDEX_PAGE;
+            return this.CLIENTS_PAGE;
         }
 
         this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " cadastrado com sucesso!");
-        return this.INDEX_PAGE;
+        return this.CLIENTS_PAGE;
     }
     
     public void excluir() {
@@ -108,10 +104,10 @@ public class ClienteMB implements Serializable {
             this.dao.updateCliente(this.cliente);
         } catch (SQLException e) {
             this.addMessage("Erro ao editar cliente: " + e.getMessage());
-            return this.INDEX_PAGE;
+            return this.CLIENTS_PAGE;
         }
         
         this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " editado com sucesso!");
-        return this.INDEX_PAGE;
+        return this.CLIENTS_PAGE;
     }
 }
