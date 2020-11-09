@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:decorate xmlns="http://www.w3.org/1999/xhtml"
+             xmlns:h="http://xmlns.jcp.org/jsf/html"
+             xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+             template="../template.xhtml"
+             xmlns:f="http://xmlns.jcp.org/jsf/core">
+    
+    <div class="container">
+        <br />
+        <h:messages />
+        
+        <h1>
+            Produtos 
+            <h:link title="Adicionar produto" outcome="new">
+                <i class="fa fa-plus fa-3"></i>
+            </h:link>
+        </h1>
+        
+        <h:form>
+            <h:dataTable class="table table-striped" value="#{produtoMB.produtos}" var="produto">
+                <h:column>
+                    <f:facet name="header">
+                        Descrição
+                    </f:facet>
+                
+                    #{produto.descricao}
+                </h:column>
+                
+                <h:column>
+                    <f:facet name="header">
+                        Ações
+                    </f:facet>
+                    
+                    <h:link
+                        type="button"
+                        class="btn btn-primary icon-button"
+                        title="Editar"
+                        outcome="edit"
+                    >
+                        <i class="fas fa-edit"></i>
+                    
+                        <f:param name="id" value="#{produto.id}" />
+                    </h:link>
+                    
+                    <h:commandLink
+                        action="#{produtoMB.setProduto(produto.id)}"
+                        type="button"
+                        class="btn btn-danger icon-button"
+                        title="Excluir"
+                        style="margin-left: 10px;"
+                    >
+                        <i class="fas fa-trash-alt"></i>
+                        
+                        <f:passThroughAttribute name="data-toggle" value="modal" />
+                        <f:passThroughAttribute name="data-target" value="#deleteProductModal" />
+                        
+                        <f:ajax render="deleteProductModalForm" />
+                    </h:commandLink>
+                </h:column>
+            </h:dataTable>
+        </h:form>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="deleteProductModal" tabindex="-1" aria-labelledby="deleteProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteProductModalLabel">Excluir Produto</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <h:form id="deleteProductModalForm" role="form">
+                        <div class="modal-body" style="text-align: center;">
+                            <div class="form-group">
+                                <p>Você deseja excluir o produto 
+                                    <b><span>#{produtoMB.produto.descricao}</span></b>?
+                                    <br/><br/>
+                                    
+                                    <i class="fas fa-exclamation-triangle" style="color: red;"></i> 
+                                    Cuidado! Esta operação é irreversível.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                            
+                            <h:commandButton
+                                class="btn btn-primary"
+                                value="Ok"
+                                action="#{produtoMB.excluir}"
+                            />
+                        </div>
+                    </h:form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</ui:decorate>
