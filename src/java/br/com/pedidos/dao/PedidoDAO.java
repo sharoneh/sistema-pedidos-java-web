@@ -1,18 +1,17 @@
 package br.com.pedidos.dao;
 
-import br.com.pedidos.models.Cliente;
-import br.com.pedidos.models.ItemDoPedido;
-import br.com.pedidos.models.Pedido;
-import br.com.pedidos.models.Produto;
-
-import javax.mail.FetchProfile;
-import java.net.ConnectException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import br.com.pedidos.models.Cliente;
+import br.com.pedidos.models.ItemDoPedido;
+import br.com.pedidos.models.Pedido;
+import br.com.pedidos.models.Produto;
+import java.util.Date;
 
 /**
  * Created by Regis Gaboardi (@gmail.com)
@@ -189,58 +188,62 @@ public class PedidoDAO {
      * @return
      * @throws SQLException
      */
-    public List<Pedido> fetchAll() throws SQLException {
+    public List<Pedido> fetchAll() throws Exception {
         this.connection = new ConnectionFactory().getConnection();
-        List<Pedido> result = new ArrayList<>();
-        String findAll = "SELECT p.data AS data," +
-                "c.id AS cid, c.nome, c.sobrenome, c.cpf," +
-                "prd.id AS proid, prd.descricao AS prodesc," +
-                "pp.quantidade " +
-                "FROM pedido p " +
-                "JOIN cliente c ON p.cliente_fk = c.id " +
-                "JOIN produto_pedido pp on p.id = pp.pedido_fk " +
-                "JOIN produto prd on pp.produto_fk = prd.id ";
+        
+        String findAll = ""
+                + "SELECT "
+                    + "p.id as pid, "
+                    + "p.data AS data, "
+                    + "c.id AS clienteId, "
+                    + "c.nome as nomeCliente, "
+                    + "c.sobrenome as sobrenome, "
+                    + "c.cpf as cpf,"
+                    + "SUM(pp.quantidade) as quantidade "
+                + "FROM pedido p "
+                + "JOIN cliente c ON p.cliente_fk = c.id "
+                + "JOIN produto_pedido pp on p.id = pp.pedido_fk "
+                + "JOIN produto prd on pp.produto_fk = prd.id "
+                + "GROUP BY pid";
         try {
             PreparedStatement itensStatement = connection.prepareStatement(findAll);
+            
             ResultSet rs = itensStatement.executeQuery();
-            List<ItemDoPedido> itens = new ArrayList<>();
+            List<Pedido> pedidos = new ArrayList<>();
+            
             while (rs.next()) {
-                Pedido each = new Pedido();
-                Produto p = new Produto();
-                ItemDoPedido i = new ItemDoPedido();
+            	Cliente cliente = new Cliente();
+            	
+            	cliente.setId(rs.getInt("clienteId"));
+            	cliente.setNome(rs.getString("nomeCliente"));
+            	cliente.setSobrenome(rs.getString("sobrenome"));
+            	cliente.setCpf(rs.getString("cpf"));
 
-                p.setId(rs.getInt("proid"));
-                p.setDescricao(rs.getString("prodesc"));
+            	ItemDoPedido item = new ItemDoPedido();
+            	item.setQuantidade(rs.getInt("quantidade"));
 
-                i.setQuantidade(rs.getInt("quantidade"));
-                i.setProduto(p);
-                itens.add(i);
-
-//              Esse trecho verifica se o cliente atual é o mesmo que o proximo
-                int currentClient = rs.getInt("cid");
-                int nextClient = 0;
-                rs.next();
-                nextClient = rs.getInt("cid");
-                rs.previous();
-
-//              O Cliente deste Pedido só será preenchido quando for diferente do proximo Cliente
-                if (currentClient != nextClient) {
-                    Cliente c = new Cliente();
-                    c.setId(rs.getInt("clid"));
-                    c.setNome(rs.getString("nome"));
-                    c.setSobrenome(rs.getString("sobrenome"));
-                    c.setCpf(rs.getString("cpf"));
-                    each.setCliente(c);
-//                  A lista de itens deste Pedido só será adicionada quando este Cliente for diferente do proximo Cliente
-                    each.setItens(itens);
-//                  Limpa a lista de itens do pedido para o proximo Pedido
-                    itens.clear();
-                }
+            	List<ItemDoPedido > itens = new ArrayList<>();
+            	itens.add(item);
+            	
+            	Pedido pedido = new Pedido();
+            		
+            	pedido.setData(rs.getDate("data"));
+                pedido.setId(rs.getInt("pid"));
+            	
+            	pedido.setItens(itens);
+            	pedido.setCliente(cliente);
+            	
+            	pedidos.add(pedido);
+            	
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            
+            return pedidos;
+            
+        } catch (Exception e) {
+        	e.printStackTrace();
+            throw new Exception();
         }
-        return result;
+        
     }
 
     /**
@@ -252,7 +255,8 @@ public class PedidoDAO {
     public Pedido find(int id) throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         Pedido result = new Pedido();
-        String findOne = "SELECT p.data AS data," +
+        String findOne = "SELECT "
+                + "p.data AS data," +
                 "c.id AS cid, c.nome, c.sobrenome, c.cpf," +
                 "prd.id AS proid, prd.descricao AS prodesc," +
                 "pp.quantidade " +
@@ -262,18 +266,21 @@ public class PedidoDAO {
                 "JOIN produto prd on pp.produto_fk = prd.id " +
                 "WHERE p.id = ?";
         try {
-            PreparedStatement ps = connection.prepareStatement(findOne);
+            PreparedStatement ps = connection.prepareStatement(findOne,
+                    ResultSet.TYPE_SCROLL_SENSITIVE, 
+                    ResultSet.CONCUR_UPDATABLE);
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             Cliente c = new Cliente();
             List<ItemDoPedido> itens = new ArrayList<>();
             if (rs.next()) {
-                c.setId(rs.getInt("clid"));
+                c.setId(rs.getInt("cid"));
                 c.setNome(rs.getString("nome"));
                 c.setSobrenome(rs.getString("sobrenome"));
                 c.setCpf(rs.getString("cpf"));
             }
             rs.beforeFirst();
+            Date d = new Date();
             while (rs.next()) {
                 Produto p = new Produto();
                 p.setDescricao(rs.getString("prodesc"));
@@ -281,11 +288,12 @@ public class PedidoDAO {
 
                 ItemDoPedido each = new ItemDoPedido();
                 each.setProduto(p);
-                each.setQuantidade(rs.getInt(rs.getInt("quantidade")));
+                each.setQuantidade(rs.getInt("quantidade"));
                 itens.add(each);
+                d = rs.getDate("data");
             }
             result.setId(id);
-            result.setData(rs.getDate("data"));
+            result.setData(d);
             result.setCliente(c);
             result.setItens(itens);
 

@@ -1,70 +1,85 @@
 package br.com.pedidos.managedbeans;
 
 import br.com.pedidos.dao.PedidoDAO;
-import br.com.pedidos.models.Cliente;
 import br.com.pedidos.models.ItemDoPedido;
 import br.com.pedidos.models.Pedido;
 import br.com.pedidos.models.Produto;
-import java.io.Serializable;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.SessionScoped;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
-import javax.mail.FetchProfile;
 
 @Named
 @RequestScoped
-public class PedidoMB implements Serializable {
-/*  private Pedido pedido = new Pedido();
+public class PedidoMB {
+    private PedidoDAO dao;
     private List<Pedido> pedidos;
-
-    public void setPedido(Pedido pedido) {
-        this.pedido = pedido;
-    }*/
-
-    PedidoDAO dao;
-    List<Pedido> pedidos;
-    String teste = "lorem ipsum";
-
-    public Pedido getPedido(int id) {
-        System.out.println("Buscando pedido com ID = " + id);
-        Pedido result = new Pedido();
+    private Pedido pedido;
+    private List<ItemDoPedido> itens;
+    private final String PEDIDOS_PAGE = "index.xhtml";
+    
+    @PostConstruct
+    public void init() {
+        this.dao = new PedidoDAO();
+        this.pedido = new Pedido();
+        this.pedidos = new ArrayList<>();
+        this.itens = new ArrayList<>();
+        
         try {
-            dao = new PedidoDAO();
-            result = dao.find(id);
-        } catch (SQLException e) {
-            e.printStackTrace();
+            this.pedidos = dao.fetchAll();
+        } catch (Exception e) {
+            this.addMessage("Erro ao buscar a lista de clientes: " + e.getMessage());
         }
-        return result;
+        
+        String pedidoIdParam = this.getPedidoIdParam();
+        
+        if (pedidoIdParam != null) {
+            this.setPedido(Integer.parseInt(pedidoIdParam));
+        }
+    }
+    
+    public String getPedidoIdParam(){
+        FacesContext context = FacesContext.getCurrentInstance();
+        Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
+        return paramMap.get("id");
+    }
+    
+    public void addMessage(String msg) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        context.addMessage("", new FacesMessage(msg));
+    }
+
+    public void setPedido(int id) {
+        try {
+            this.pedido = dao.find(id);
+        } catch (SQLException e) {
+            this.addMessage("SQLException: Erro ao definir o pedido do managed bean PedidoMB: " + e.getMessage());
+        }
+    }
+    
+    public Pedido getPedido() {
+        return this.pedido;
+    }
+    
+    public List<Pedido> getPedidos() {
+        return this.pedidos;
     }
 
     public List<ItemDoPedido> getItensPedido(int id) {
         System.out.println("Buscando itens do pedido do cliente com ID = " + id);
-        List<ItemDoPedido> result = new ArrayList<>();
+        
         try {
-            dao = new PedidoDAO();
-            result = dao.findItensDoCliente(id);
+            this.itens = this.dao.findItensDoCliente(id);
         } catch (SQLException e) {
-            e.printStackTrace();
+            this.addMessage("Erro ao buscar a lista de itens do pedido: " + e.getMessage());
         }
-        return result;
-    }
-    
-    public List<Pedido> getPedidos() {
-        System.out.println("Buscando todos os pedidos");
-        List<Pedido> result = new ArrayList<>();
-        try {
-            dao = new PedidoDAO();
-            result = dao.fetchAll();
-        }catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return result;
+        return this.itens;
     }
     
     public String getPedidoIdFromUrl(){
@@ -73,34 +88,21 @@ public class PedidoMB implements Serializable {
         return paramMap.get("id");
     }
     
-    public void show() {
-         try{
-            int pedidoId = Integer.parseInt(getPedidoIdFromUrl());
-            Pedido pedido = new Pedido();
-            pedido = getPedidos().stream()
-                .filter(ped -> ped.getId() == pedidoId)
-                .findFirst()
-                .orElse(null);
-        }catch(NumberFormatException ex){
-            return;
-        }
-    }
-    
     public int[] listaQuantidadeItens(){
-        return new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+        return new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
     }
     
     public String incluirPedido(Produto produto, int q, Pedido pedido) {
         System.out.println("Adicionando produto " + produto.getDescricao() + " ao pedido numero " + pedido.getId());
+        
         try {
-            dao = new PedidoDAO();
             ItemDoPedido item = new ItemDoPedido(q, produto);
-            dao.saveItem(item, pedido.getId());
+            this.dao.saveItem(item, pedido.getId());
         } catch (SQLException e) {
-            e.printStackTrace();
+            this.addMessage("Erro ao incluir um pedido: " + e.getMessage());
         }
         
-        return "index.xhtml";
+        return this.PEDIDOS_PAGE;
     }
 }
 
