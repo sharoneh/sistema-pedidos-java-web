@@ -21,7 +21,7 @@ public class PedidoMB {
     private PedidoDAO dao;
     private List<Pedido> pedidos;
     private Pedido pedido;
-    private List<ItemDoPedido> itens;
+    private List<ItemDoPedido> itensPedido;
     private final String PEDIDOS_PAGE = "index.xhtml";
     
     @PostConstruct
@@ -29,7 +29,7 @@ public class PedidoMB {
         this.dao = new PedidoDAO();
         this.pedido = new Pedido();
         this.pedidos = new ArrayList<>();
-        this.itens = new ArrayList<>();
+        this.itensPedido = new ArrayList<>();
         
         try {
             this.pedidos = dao.fetchAll();
@@ -71,15 +71,16 @@ public class PedidoMB {
         return this.pedidos;
     }
 
-    public List<ItemDoPedido> getItensPedido(int id) {
-        System.out.println("Buscando itens do pedido do cliente com ID = " + id);
-        
-        try {
-            this.itens = this.dao.findItensDoCliente(id);
-        } catch (SQLException e) {
-            this.addMessage("Erro ao buscar a lista de itens do pedido: " + e.getMessage());
-        }
-        return this.itens;
+//    public List<ItemDoPedido> getItensPedido(int id) {
+    public List<ItemDoPedido> getItensPedido() {
+//        System.out.println("Buscando itens do pedido do cliente com ID = " + id);
+//        
+//        try {
+//            this.itensPedido = this.dao.findItensDoCliente(id);
+//        } catch (SQLException e) {
+//            this.addMessage("Erro ao buscar a lista de itens do pedido: " + e.getMessage());
+//        }
+        return this.itensPedido;
     }
     
     public String getPedidoIdFromUrl(){
