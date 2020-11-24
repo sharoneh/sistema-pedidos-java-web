@@ -35,7 +35,7 @@ public class ProdutoMB implements Serializable {
         
         try {
             this.produtos = dao.fetchAll();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             this.addMessage("Erro ao buscar a lista de produtos: " + e.getMessage());
         }
         

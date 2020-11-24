@@ -92,11 +92,11 @@ public class ClienteMB implements Serializable {
             this.dao.removeCliente(this.cliente);
             this.clientes = dao.fetchAll();
         } catch (SQLException e) {
-            this.addMessage("Erro na tentativa de excluir um cliente: " + e.getMessage());
+            this.addMessage("Erro na tentativa de excluir um cliente: ");
             return;
         }
         
-        this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " excluído com sucesso!");
+        this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " excluido com sucesso!");
     }
     
     public String editar() {
