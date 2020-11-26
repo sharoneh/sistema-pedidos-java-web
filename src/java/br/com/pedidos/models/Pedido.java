@@ -59,7 +59,7 @@ public class Pedido {
     }
     
     public String dataPedidoFormatada() {
-        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
         return DateFor.format(this.data);
     }
     

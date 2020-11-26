@@ -93,7 +93,7 @@ public class ClienteDAO implements Serializable {
         }
         return result;
     }
-
+    
     public List<Cliente> fetchAll() throws SQLException {
         this.connection = new ConnectionFactory().getConnection();
         String selectAll = "SELECT id, nome, cpf, sobrenome FROM cliente";

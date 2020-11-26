@@ -35,8 +35,8 @@ public class ProdutoMB implements Serializable {
         
         try {
             this.produtos = dao.fetchAll();
-        } catch (SQLException e) {
-            this.addMessage("Erro ao buscar a lista de produtos: " + e.getMessage());
+        } catch (Exception e) {
+            this.addMessage("Erro ao buscar a lista de produtos.");
         }
         
         String produtoIdParam = this.getProdutoIdParam();
@@ -68,10 +68,8 @@ public class ProdutoMB implements Serializable {
     public void setProduto(int id) {
         try {
             this.produto = this.dao.find(id);
-        } catch (SQLException e) {
-            this.addMessage("SQLException: Erro ao definir o produto do managed bean ProdutoMB: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            this.addMessage("NumberFormatException: Erro ao definir o produto do managed bean ProdutoMB: " + e.getMessage());
+        } catch (SQLException | NumberFormatException e) {
+            this.addMessage("Erro ao definir o produto do managed bean ProdutoMB.");
         }
     }
     
@@ -79,7 +77,7 @@ public class ProdutoMB implements Serializable {
         try {
             this.dao.createProduto(this.produto);
         }  catch (SQLException e) {
-            this.addMessage("Erro na tentativa de adicionar um produto: " + e.getMessage());
+            this.addMessage("Erro na tentativa de adicionar um produto.");
             return this.PRODUCTS_PAGE;
         }
         
@@ -92,7 +90,7 @@ public class ProdutoMB implements Serializable {
             this.dao.removeProduto(this.produto);
             this.produtos = this.dao.fetchAll();
         } catch (SQLException e) {
-            this.addMessage("Erro na tentativa de excluir um produto: " + e.getMessage());
+            this.addMessage("Erro na tentativa de excluir um produto.");
             return;
         }
         
@@ -103,7 +101,7 @@ public class ProdutoMB implements Serializable {
         try {
             this.dao.updateProduto(this.produto);
         }  catch (SQLException e) {
-            this.addMessage("Erro na tentativa de editar um produto: " + e.getMessage());
+            this.addMessage("Erro na tentativa de editar um produto.");
             return this.PRODUCTS_PAGE;
         }
         

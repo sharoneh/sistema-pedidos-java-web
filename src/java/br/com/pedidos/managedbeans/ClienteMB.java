@@ -36,7 +36,7 @@ public class ClienteMB implements Serializable {
         try {
             this.clientes = dao.fetchAll();
         } catch (SQLException e) {
-            this.addMessage("Erro ao buscar a lista de clientes: " + e.getMessage());
+            this.addMessage("Erro ao buscar a lista de clientes.");
         }
         
         String clienteIdParam = this.getClienteIdParam();
@@ -68,10 +68,8 @@ public class ClienteMB implements Serializable {
     public void setCliente(int id) {
         try {
             this.cliente = this.dao.find(id);
-        } catch (SQLException e) {
-            this.addMessage("SQLException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
-        } catch (NumberFormatException e) {
-            this.addMessage("NumberFormatException: Erro ao definir o cliente do managed bean ClienteMB: " + e.getMessage());
+        } catch (SQLException | NumberFormatException e) {
+            this.addMessage("Erro ao buscar o cliente na base de dados.");
         }
     }
     
@@ -79,7 +77,7 @@ public class ClienteMB implements Serializable {
         try {
             this.dao.createCliente(this.cliente);
         }  catch (SQLException e) {
-            this.addMessage("Erro na tentativa de adicionar um cliente: " + e.getMessage());
+            this.addMessage("Erro na tentativa de adicionar um cliente.");
             return this.CLIENTS_PAGE;
         }
 
@@ -92,18 +90,18 @@ public class ClienteMB implements Serializable {
             this.dao.removeCliente(this.cliente);
             this.clientes = dao.fetchAll();
         } catch (SQLException e) {
-            this.addMessage("Erro na tentativa de excluir um cliente: " + e.getMessage());
+            this.addMessage("Erro na tentativa de excluir um cliente.");
             return;
         }
         
-        this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " excluído com sucesso!");
+        this.addMessage("Cliente " + this.cliente.getNomeCompleto() + " excluido com sucesso!");
     }
     
     public String editar() {
         try {
             this.dao.updateCliente(this.cliente);
         } catch (SQLException e) {
-            this.addMessage("Erro ao editar cliente: " + e.getMessage());
+            this.addMessage("Erro ao editar cliente.");
             return this.CLIENTS_PAGE;
         }
         

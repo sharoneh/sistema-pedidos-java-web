@@ -1,27 +1,36 @@
 package br.com.pedidos.managedbeans;
 
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
+
 import br.com.pedidos.dao.PedidoDAO;
 import br.com.pedidos.models.ItemDoPedido;
 import br.com.pedidos.models.Pedido;
 import br.com.pedidos.models.Produto;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.inject.Named;
-
-@Named
+@ManagedBean
 @RequestScoped
-public class PedidoMB {
+public class PedidoMB implements Serializable {
+
     private PedidoDAO dao;
     private List<Pedido> pedidos;
     private Pedido pedido;
     private List<ItemDoPedido> itensPedido;
+    private List<ItemDoPedido> prodPedido;
+    private int quantidade;
+    private Produto produto;
+
+    private int[] qtdes = new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
+    
     private final String PEDIDOS_PAGE = "index.xhtml";
     
     @PostConstruct
@@ -30,11 +39,13 @@ public class PedidoMB {
         this.pedido = new Pedido();
         this.pedidos = new ArrayList<>();
         this.itensPedido = new ArrayList<>();
+        this.prodPedido = new ArrayList<>();
+        this.produto = new Produto();
         
         try {
             this.pedidos = dao.fetchAll();
         } catch (Exception e) {
-            this.addMessage("Erro ao buscar a lista de clientes: " + e.getMessage());
+            this.addMessage("Erro ao buscar a lista de clientes.");
         }
         
         String pedidoIdParam = this.getPedidoIdParam();
@@ -44,6 +55,22 @@ public class PedidoMB {
         }
     }
     
+    public int getQuantidade() {
+        return quantidade;
+    }
+
+    public void setQuantidade(int quantidade) {
+        this.quantidade = quantidade;
+    }
+
+    public Produto getProduto() {
+        return produto;
+    }
+
+    public void setProduto(Produto produto) {
+        this.produto = produto;
+    }
+
     public String getPedidoIdParam(){
         FacesContext context = FacesContext.getCurrentInstance();
         Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
@@ -59,7 +86,7 @@ public class PedidoMB {
         try {
             this.pedido = dao.find(id);
         } catch (SQLException e) {
-            this.addMessage("SQLException: Erro ao definir o pedido do managed bean PedidoMB: " + e.getMessage());
+            this.addMessage("Erro ao buscar o pedido na base de dados.");
         }
     }
     
@@ -70,27 +97,23 @@ public class PedidoMB {
     public List<Pedido> getPedidos() {
         return this.pedidos;
     }
-
-//    public List<ItemDoPedido> getItensPedido(int id) {
+ 
     public List<ItemDoPedido> getItensPedido() {
-//        System.out.println("Buscando itens do pedido do cliente com ID = " + id);
-//        
-//        try {
-//            this.itensPedido = this.dao.findItensDoCliente(id);
-//        } catch (SQLException e) {
-//            this.addMessage("Erro ao buscar a lista de itens do pedido: " + e.getMessage());
-//        }
         return this.itensPedido;
+    }
+
+    public int[] getQtdes() {
+        return qtdes;
+    }
+
+    public void setQtdes(int[] qtdes) {
+        this.qtdes = qtdes;
     }
     
     public String getPedidoIdFromUrl(){
         FacesContext context = FacesContext.getCurrentInstance();
         Map<String, String> paramMap = context.getExternalContext().getRequestParameterMap();
         return paramMap.get("id");
-    }
-    
-    public int[] listaQuantidadeItens(){
-        return new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20};
     }
     
     public String incluirPedido(Produto produto, int q, Pedido pedido) {
@@ -105,5 +128,15 @@ public class PedidoMB {
         
         return this.PEDIDOS_PAGE;
     }
-}
 
+    public List<ItemDoPedido> getProdPedido() {
+        return prodPedido;
+    }
+
+    public void addProduto() {
+        ItemDoPedido item = new ItemDoPedido();
+        item.setQuantidade(quantidade);
+        item.setProduto(produto);
+        prodPedido.add(item);
+    }
+}
