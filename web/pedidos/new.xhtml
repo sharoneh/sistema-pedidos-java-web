@@ -25,31 +25,6 @@
                         <f:selectItem itemValue = "#{cliente.id}" itemLabel = "#{cliente.nomeCompleto}" />	
                     </c:forEach> 
                 </h:selectOneMenu> 
-                
-                <div class="form-group">
-                    <label for="cpf">CPF</label>
-
-                    <h:inputText
-                        id="cpf"
-                        class="form-control cpf-cliente"
-                        value="#{clienteMB.cliente.cpf}"
-                        required="true"
-                        requiredMessage="CPF do cliente deve ser preenchido"
-                    >
-                        <f:validator validatorId="br.com.pedidos.validators.CpfUnicoClienteValidator" />
-                    </h:inputText>
-
-                    <h:message for="cpf" errorStyle="color: red;" />
-                    
-                    <h:commandButton
-                        class="btn btn-primary"
-                        action="#{clienteMB.buscar}"
-                        value="Buscar cliente"
-                    />
-                    
-                    
-                    <label>#{clienteMB.cliente ? clienteMB.cliente.nomeCompleto : ""}</label>
-                </div>
             </div>
             
             <c:forEach var="item" items="#{pedido.itens}">
